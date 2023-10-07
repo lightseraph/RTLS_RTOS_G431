@@ -1,0 +1,32 @@
+{
+	"folders": [
+		{
+			"name": "RTLS_RTOS_G431",
+			"path": "."
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"*.ino": "cpp",
+			"stm32g0xx.h": "c",
+			"cmsis_os.h": "c",
+			"main.h": "c",
+			"sys.h": "c",
+			"ctiic.h": "c",
+			"freertos.h": "c",
+			"freertosconfig.h": "c",
+			"task.h": "c",
+			"config_options.h": "c",
+			"dw_app.h": "c",
+			"port.h": "c",
+			"eeprom.h": "c",
+			"ssd1306.h": "c",
+			"fonts.h": "c",
+			"instance.h": "c",
+			"stdint.h": "c",
+			"key.h": "c",
+			"delay.h": "c",
+			"stm32g4xx_hal_def.h": "c"
+		}
+	}
+}
