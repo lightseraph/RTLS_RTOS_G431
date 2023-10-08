@@ -186,14 +186,14 @@ uint8_t anch_txresponse_or_rx_reenable(void)
 		sendResp = 1;
 	}
 
-	// inst->delayedTRXTime32h += inst->fixedReplyDelayAnc32h + 20000;
+	inst->delayedTRXTime32h += inst->fixedReplyDelayAnc32h;
 
 	if (sendResp == 1)
 	{
 		inst->wait4ack = DWT_RESPONSE_EXPECTED; // re has/will be re-enabled
 
-		dwt_setdelayedtrxtime(inst->fixedReplyDelayAnc32h);
-		int ret = dwt_starttx(DWT_START_TX_DLY_RS | DWT_RESPONSE_EXPECTED);
+		dwt_setdelayedtrxtime(inst->delayedTRXTime32h);
+		int ret = dwt_starttx(DWT_START_TX_DELAYED | DWT_RESPONSE_EXPECTED);
 
 		if (ret)
 		{

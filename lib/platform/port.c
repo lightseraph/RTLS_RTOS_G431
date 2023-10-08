@@ -335,7 +335,7 @@ void led_on(led_t led)
 
 /* @fn      port_set_dw_ic_spi_slowrate
  * @brief   set 4MHz
- *          note: hspi1 is clocked from 64MHz
+ *          note: hspi1 is clocked from 150MHz
  * */
 void port_set_dw_ic_spi_slowrate(void)
 {
@@ -345,7 +345,7 @@ void port_set_dw_ic_spi_slowrate(void)
 
 /* @fn      port_set_dw_ic_spi_fastrate
  * @brief   set 32MHz
- *          note: hspi1 is clocked from 64MHz
+ *          note: hspi1 is clocked from 150MHz
  * */
 void port_set_dw_ic_spi_fastrate(void)
 {

@@ -16,7 +16,7 @@
 #include <port.h>
 #include <stm32g4xx_hal_def.h>
 
-extern SPI_HandleTypeDef hspi1; /*clocked from 64MHz*/
+extern SPI_HandleTypeDef hspi1; /*clocked from 150MHz*/
 
 /****************************************************************************/ /**
                                                                                 *
