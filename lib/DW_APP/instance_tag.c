@@ -571,9 +571,9 @@ int tag_app_run(instance_data_t *inst)
 					*/
 					inst->tagSleepCorrection_ms = (int16_t)(((uint16_t)messageData[RES_TAG_SLP1] << 8) + messageData[RES_TAG_SLP0]);
 					// printf("sleep correction: %ld\r\n", inst->tagSleepCorrection_ms);
-					char buff[20];
+					/* char buff[20];
 					sprintf(buff, "correction: %ld\r\n", inst->tagSleepCorrection_ms);
-					LCD_DISPLAY(0, 32, buff);
+					LCD_DISPLAY(0, 32, buff); */
 					inst->tagSleepRnd_ms = 0;
 				}
 

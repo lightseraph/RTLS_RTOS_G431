@@ -19,20 +19,20 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 // IO方向设置
-#define IIC_SDA_IN()                    \
-    {                                   \
-        GPIOA->ODR &= ~(3 << (12 * 2)); \
-        GPIOA->ODR |= 0 << 12 * 2;      \
+#define IIC_SDA_IN()                     \
+    {                                    \
+        GPIOA->MODER &= ~(3 << (0 * 2)); \
+        GPIOA->MODER |= 0 << 0 * 2;      \
     } // PG7输入模式
-#define IIC_SDA_OUT()                   \
-    {                                   \
-        GPIOA->ODR &= ~(3 << (12 * 2)); \
-        GPIOA->ODR |= 1 << 12 * 2;      \
+#define IIC_SDA_OUT()                    \
+    {                                    \
+        GPIOA->MODER &= ~(3 << (0 * 2)); \
+        GPIOA->MODER |= 1 << 0 * 2;      \
     } // PG7输出模式
 // IO操作函数
-#define IIC_SCL(n) (n ? HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, GPIO_PIN_SET) : HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, GPIO_PIN_RESET)) // SCL
-#define IIC_SDA(n) (n ? HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_SET) : HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_RESET)) // SDA
-#define IIC_READ_SDA HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_12)                                                                            // 输入SDA
+#define IIC_SCL(n) (n ? HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, GPIO_PIN_SET) : HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, GPIO_PIN_RESET)) // SCL
+#define IIC_SDA(n) (n ? HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_SET) : HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_RESET)) // SDA
+#define IIC_READ_SDA HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0)                                                                           // 输入SDA
 
 // IIC所有操作函数
 void IIC_Init(void);       // 初始化IIC的IO口
