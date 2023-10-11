@@ -18,7 +18,6 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "cmsis_os.h"
 #include "dma.h"
 #include "iwdg.h"
 #include "spi.h"
@@ -34,6 +33,7 @@
 #include "ssd1306.h"
 #include "eeprom.h"
 #include "dw_app.h"
+#include "led.h"
 #include <errno.h>
 #include <sys/unistd.h>
 /* USER CODE END Includes */
@@ -61,7 +61,6 @@ extern uint8_t UART_RX_BUF[1];
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
-void MX_FREERTOS_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -104,6 +103,7 @@ int main(void)
   MX_SPI1_Init();
   MX_USART2_UART_Init();
   MX_TIM6_Init();
+  MX_TIM7_Init();
   /* USER CODE BEGIN 2 */
   delay_init();
   KEY_Config();
@@ -112,29 +112,26 @@ int main(void)
 
   HAL_TIM_Base_Start_IT(&htim6);
   HAL_UART_Receive_DMA(&huart2, &UART_RX_BUF[0], 1);
-  HAL_IWDG_Refresh(&hiwdg);
+
   if (AT24CXX_Check())
   {
     Write_UWB_Default_Param();
     AT24CXX_WriteOneByte(0x000, EEPROM_DATAFORMAT);
     HAL_Delay(20);
   }
+  // HAL_IWDG_Refresh(&hiwdg);
   init_UWB_User_Param();
   LCD_DISPLAY_UWB();
+  DW_Init_Task();
   /* USER CODE END 2 */
 
-  /* Init scheduler */
-  osKernelInitialize();  /* Call init function for freertos objects (in freertos.c) */
-  MX_FREERTOS_Init();
-
-  /* Start scheduler */
-  osKernelStart();
-
-  /* We should never get here as control is now taken by the scheduler */
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+    // HAL_IWDG_Refresh(&hiwdg);
+    HAL_GPIO_TogglePin(LED2_GPIO_Port, LED2_Pin);
+    DW_Main_Task();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -214,27 +211,6 @@ int _write(int file, char *data, int len)
   return (status == HAL_OK ? len : 0);
 }
 /* USER CODE END 4 */
-
-/**
-  * @brief  Period elapsed callback in non blocking mode
-  * @note   This function is called  when TIM7 interrupt took place, inside
-  * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment
-  * a global variable "uwTick" used as application time base.
-  * @param  htim : TIM handle
-  * @retval None
-  */
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
-{
-  /* USER CODE BEGIN Callback 0 */
-
-  /* USER CODE END Callback 0 */
-  if (htim->Instance == TIM7) {
-    HAL_IncTick();
-  }
-  /* USER CODE BEGIN Callback 1 */
-
-  /* USER CODE END Callback 1 */
-}
 
 /**
   * @brief  This function is executed in case of error occurrence.

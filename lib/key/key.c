@@ -3,13 +3,7 @@
 #include "led.h"
 
 KEY_PROCESS_TypeDef key[KEYS];
-#if SYSTEM_SUPPORT_OS == 1
 
-extern osMessageQueueId_t FLASH_LED_QHandle;
-extern osSemaphoreId_t KEY_EVENT_SEMAHandle;
-extern osEventFlagsId_t KEY_EVENTHandle;
-
-#endif
 void KEY_Process(int key_num)
 {
 
@@ -43,10 +37,6 @@ void KEY_Process(int key_num)
                 key[key_num].flag.once_event = 1;                   // 产生按键事件
                 key[key_num].press_cnt = 1;
                 key[key_num].time_idle = KEY_TIME_OUT; // 按键空闲时间超时
-                if (SYSTEM_SUPPORT_OS)                 // 长按事件单独发送按钮事件信号量
-                {
-                    xSemaphoreGive(KEY_EVENT_SEMAHandle);
-                }
             }
         }
 
@@ -108,10 +98,6 @@ void KEY_Process(int key_num)
                 // 松开前是短按标志，则产生按键事件，这里是为了屏蔽长按后的松手动作
                 key[key_num].flag.once_event = 1;             // 产生按键事件
                 key[key_num].flag.key_state = KEY_STATE_IDLE; // 进入无动作状态
-                if (SYSTEM_SUPPORT_OS)
-                {
-                    xSemaphoreGive(KEY_EVENT_SEMAHandle);
-                }
             }
         }
         break;
@@ -124,7 +110,6 @@ void KEY_Process(int key_num)
 void KEY_Scan(void)
 {
     // LED_Param flashParam;
-    EventBits_t keyEvent = xEventGroupGetBits(KEY_EVENTHandle);
     for (int i = 0; i < KEYS; i++)
     {
         if (key[i].flag.once_event)
@@ -142,10 +127,9 @@ void KEY_Scan(void)
                     flashParam.count = 4;
                     flashParam.interval = 200;
                     xQueueSend(FLASH_LED_QHandle, (void *)&flashParam, pdMS_TO_TICKS(500)); */
-                    xEventGroupSetBits(KEY_EVENTHandle, EVENTBIT_KEY_PLUS_CLICK);
                     break;
                 case 1:
-                    xEventGroupSetBits(KEY_EVENTHandle, EVENTBIT_KEY_MINUS_CLICK);
+
                     break;
                 }
                 break;
@@ -153,10 +137,10 @@ void KEY_Scan(void)
                 switch (i)
                 {
                 case 0:
-                    xEventGroupSetBits(KEY_EVENTHandle, EVENTBIT_KEY_PLUS_DCLICK);
+
                     break;
                 case 1:
-                    xEventGroupSetBits(KEY_EVENTHandle, EVENTBIT_KEY_MINUS_DCLICK);
+
                     break;
                 }
                 break;
@@ -164,10 +148,10 @@ void KEY_Scan(void)
                 switch (i)
                 {
                 case 0:
-                    xEventGroupSetBits(KEY_EVENTHandle, EVENTBIT_KEY_PLUS_MCLICK);
+
                     break;
                 case 1:
-                    xEventGroupSetBits(KEY_EVENTHandle, EVENTBIT_KEY_MINUS_MCLICK);
+
                     break;
                 }
                 break;
@@ -175,22 +159,10 @@ void KEY_Scan(void)
                 switch (i)
                 {
                 case 0:
-                    if ((keyEvent & EVENTBIT_MASK_KEY_PLUS_LONGPRESS) == EVENTBIT_KEY_PLUS_LONGPRESS)
-                        xEventGroupClearBits(KEY_EVENTHandle, EVENTBIT_KEY_PLUS_LONGPRESS);
-                    else
-                    {
-                        xEventGroupSetBits(KEY_EVENTHandle, EVENTBIT_KEY_PLUS_LONGPRESS);
-                        xEventGroupClearBits(KEY_EVENTHandle, EVENTBIT_KEY_MINUS_LONGPRESS);
-                    }
+
                     break;
                 case 1:
-                    if ((keyEvent & EVENTBIT_MASK_KEY_MINUS_LONGPRESS) == EVENTBIT_KEY_MINUS_LONGPRESS)
-                        xEventGroupClearBits(KEY_EVENTHandle, EVENTBIT_KEY_MINUS_LONGPRESS);
-                    else
-                    {
-                        xEventGroupSetBits(KEY_EVENTHandle, EVENTBIT_KEY_MINUS_LONGPRESS);
-                        xEventGroupClearBits(KEY_EVENTHandle, EVENTBIT_KEY_PLUS_LONGPRESS);
-                    }
+
                     break;
                 }
                 break;

@@ -31,7 +31,6 @@ uint8_t UART_RX_DATA[256] = {0};
 uint8_t UART_RX_DATA_len = 0;
 uint8_t UART_RX_start_flag = 0;
 
-extern osSemaphoreId_t UART_RX_SEMAHandle;
 /* USER CODE END 0 */
 
 UART_HandleTypeDef huart2;
@@ -154,7 +153,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef* uartHandle)
     __HAL_LINKDMA(uartHandle,hdmatx,hdma_usart2_tx);
 
     /* USART2 interrupt Init */
-    HAL_NVIC_SetPriority(USART2_IRQn, 5, 0);
+    HAL_NVIC_SetPriority(USART2_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(USART2_IRQn);
   /* USER CODE BEGIN USART2_MspInit 1 */
 
@@ -211,7 +210,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
       /*
         数据解析和指令执行
       */
-      xSemaphoreGiveFromISR(UART_RX_SEMAHandle, NULL);
+      Parse_RX();
       UART_RX_DATA_len = 0;
       // HAL_NVIC_SystemReset();//重启
     }

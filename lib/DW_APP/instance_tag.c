@@ -496,7 +496,7 @@ int tag_app_run(instance_data_t *inst)
 			if (count > 20000) // 如长时间未得到中断，为避免死机，重启设备
 			{
 				count = 0;
-				HAL_NVIC_SystemReset(); // 重启
+				// HAL_NVIC_SystemReset(); // 重启
 			}
 			break;
 		}

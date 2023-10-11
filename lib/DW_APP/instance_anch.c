@@ -17,7 +17,6 @@
 #include "instance.h"
 #include "ssd1306.h"
 
-extern osMessageQueueId_t SerialOut_QHandle;
 // ----------------------------------------------------------------------------------------------
 // 函数声明
 // ----------------------------------------------------------------------------------------------
@@ -402,8 +401,6 @@ void rx_ok_cb_anch(const dwt_cb_data_t *rxd)
 	uint8_t srcAddr_index = 0;
 	event_data_t dw_event;
 
-	uint32_t save = taskENTER_CRITICAL_FROM_ISR();
-
 	dw_event.uTimeStamp = portGetTickCnt();
 	dw_event.rxLength = rxd->datalength;
 
@@ -541,7 +538,6 @@ void rx_ok_cb_anch(const dwt_cb_data_t *rxd)
 	{
 		anch_handle_error_unknownframe_timeout(dw_event);
 	}
-	taskEXIT_CRITICAL_FROM_ISR(save);
 }
 
 /*

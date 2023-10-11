@@ -5,7 +5,6 @@
 #include "instance.h"
 #include "eeprom.h"
 #include "usart.h"
-#include "cmsis_os.h"
 
 extern double dwt_getrangebias(uint8_t chan, float range, uint8_t prf);
 

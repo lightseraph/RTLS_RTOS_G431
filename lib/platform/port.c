@@ -72,8 +72,8 @@ int usleep(__useconds_t usec)
 __INLINE void
 Sleep(uint32_t x)
 {
-    // HAL_Delay(x);
-    osDelay(x);
+    HAL_Delay(x);
+    // osDelay(x);
 }
 
 /****************************************************************************/ /**

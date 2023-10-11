@@ -1,16 +1,14 @@
 #include "dw_app.h"
 #include "ssd1306.h"
-#include "cmsis_os.h"
 #include "iwdg.h"
 #include "eeprom.h"
 #include "stdio.h"
+#include "delay.h"
 
 #define TX_ANT_DLY 16385
 #define RX_ANT_DLY 16385
 
 extern dwt_txconfig_t txconfig_options;
-extern osThreadId_t defaultTaskHandle;
-extern osThreadId_t DW_MainHandle;
 
 uint32 inittestapplication(void);
 
@@ -123,33 +121,31 @@ uint8_t decarangingmode(void)
     return mode;
 }
 
-void DW_Init_Task(void *argument)
+void DW_Init_Task(void)
 {
     port_DisableEXT_IRQ();
     // port_set_dw_ic_spi_fastrate();
     reset_DWIC();
-    osDelay(2);
+    delay_ms(10);
 
     while (!dwt_checkidlerc())
     {
-        osDelay(1);
+        delay_ms(1);
     };
 
     if (inittestapplication() != (uint32)-1)
     {
         LCD_DISPLAY(0, 32, "DW Config Success!");
-        xTaskNotifyGive(defaultTaskHandle); // 初始化成功通知启动看门狗和LED闪烁任务
-        xTaskNotifyGive(DW_MainHandle);     // 通知启动DW主任务
         port_EnableEXT_IRQ();
-        osDelay(2000);
+        delay_ms(1000);
+        HAL_IWDG_Refresh(&hiwdg);
         LCD_DISPLAY(0, 32, "                  ");
-        vTaskDelete(NULL);
     }
     else
         LCD_DISPLAY(0, 32, "DW Config Fail!");
 }
 
-void DW_Main_Task(void *argument)
+void DW_Main_Task(void)
 {
     /* int rx = 0;
     int toggle = 0;
@@ -157,119 +153,115 @@ void DW_Main_Task(void *argument)
     uint64_t printLCDTWRReports = 0;
     uint64_t NanTWRReports = 0; */
 
-    ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-    for (;;)
-    {
-        HAL_IWDG_Refresh(&hiwdg);
-        instance_data_t *inst = instance_get_local_structure_ptr();
-        int monitor_local = inst->monitor;
-        int txdiff = (portGetTickCnt() - inst->timeofTx);
-        instance_mode = instance_get_role();
+    HAL_IWDG_Refresh(&hiwdg);
+    instance_data_t *inst = instance_get_local_structure_ptr();
+    int monitor_local = inst->monitor;
+    int txdiff = (portGetTickCnt() - inst->timeofTx);
+    instance_mode = instance_get_role();
 
-        if (instance_mode == TAG) // 根据角色进入相应的状态机流程
+    if (instance_mode == TAG) // 根据角色进入相应的状态机流程
+    {
+        tag_run();
+    }
+    else
+    {
+        anch_run();
+    }
+
+    if ((monitor_local == 1) && (txdiff > inst->slotDuration_ms))
+    {
+        inst->wait4ack = 0;
+        if (instance_mode == TAG)
         {
-            tag_run();
+            tag_process_rx_timeout(inst);
         }
         else
         {
-            anch_run();
+            dwt_forcetrxoff();
+            inst->AppState = TA_RXE_WAIT;
         }
+        inst->monitor = 0;
+    }
 
-        if ((monitor_local == 1) && (txdiff > inst->slotDuration_ms))
-        {
-            inst->wait4ack = 0;
-            if (instance_mode == TAG)
-            {
-                tag_process_rx_timeout(inst);
-            }
-            else
-            {
-                dwt_forcetrxoff();
-                inst->AppState = TA_RXE_WAIT;
-            }
-            inst->monitor = 0;
-        }
+    /* rx = instance_newrange();
+    if (rx != TOF_REPORT_NUL)
+    {
+        NanTWRReports = 0;
+        int l = 0, r = 0, aaddr, taddr;
+        int rangeTime, valid;
 
-        /* rx = instance_newrange();
-        if (rx != TOF_REPORT_NUL)
-        {
-            NanTWRReports = 0;
-            int l = 0, r = 0, aaddr, taddr;
-            int rangeTime, valid;
-
-            aaddr = instance_newrangeancadd() & 0xf;
+        aaddr = instance_newrangeancadd() & 0xf;
 #if (DISCOVERY == 1)
-            taddr = instance_newrangetagadd() & 0xff;
+        taddr = instance_newrangetagadd() & 0xff;
 #else
-            taddr = instance_newrangetagadd() & 0xff;
+        taddr = instance_newrangetagadd() & 0xff;
 #endif
-            rangeTime = instance_newrangetim() & 0xffffffff;
+        rangeTime = instance_newrangetim() & 0xffffffff;
 
 #if (OLED == 1)
 
-            if (printLCDTWRReports + 1500 <= portGetTickCnt())
+        if (printLCDTWRReports + 1500 <= portGetTickCnt())
+        {
+            // 每1.5S更新一次测距数据
+            if (instance_mode == ANCHOR)
             {
-                // 每1.5S更新一次测距数据
-                if (instance_mode == ANCHOR)
+                int b = 0;
+                double rangetotag = instance_get_tagdist(toggle);
+
+                while (((int)(rangetotag * 1000)) == 0)
                 {
-                    int b = 0;
-                    double rangetotag = instance_get_tagdist(toggle);
+                    if (b > (max_tag_num - 1))
+                        break;
 
-                    while (((int)(rangetotag * 1000)) == 0)
-                    {
-                        if (b > (max_tag_num - 1))
-                            break;
-
-                        toggle++;
-                        if (toggle >= max_tag_num)
-                            toggle = 0;
-
-                        rangetotag = instance_get_tagdist(toggle);
-                        b++;
-                    }
-                    sprintf((char *)&lcd_data[0], "A%d-T%d: %3.2f m  ", ancaddr, toggle, rangetotag);
-                    LCD_DISPLAY(0, 48, lcd_data);
-                    // sprintf((char *)&RxPower, "T%d: %3.1f dBm   ", toggle, inst->rxPower[0]);
-                    // LCD_DISPLAY(0, 16, RxPower);
                     toggle++;
                     if (toggle >= max_tag_num)
                         toggle = 0;
+
+                    rangetotag = instance_get_tagdist(toggle);
+                    b++;
                 }
-                else if (instance_mode == TAG)
+                sprintf((char *)&lcd_data[0], "A%d-T%d: %3.2f m  ", ancaddr, toggle, rangetotag);
+                LCD_DISPLAY(0, 48, lcd_data);
+                // sprintf((char *)&RxPower, "T%d: %3.1f dBm   ", toggle, inst->rxPower[0]);
+                // LCD_DISPLAY(0, 16, RxPower);
+                toggle++;
+                if (toggle >= max_tag_num)
+                    toggle = 0;
+            }
+            else if (instance_mode == TAG)
+            {
+                int b = 0;
+                double rangetotag = instance_get_idist(toggle);
+
+                while (((int)(rangetotag * 1000)) == 0)
                 {
-                    int b = 0;
-                    double rangetotag = instance_get_idist(toggle);
+                    if (b > (MAX_ANCHOR_LIST_SIZE - 1))
+                        break;
 
-                    while (((int)(rangetotag * 1000)) == 0)
-                    {
-                        if (b > (MAX_ANCHOR_LIST_SIZE - 1))
-                            break;
-
-                        toggle++;
-                        if (toggle >= MAX_ANCHOR_LIST_SIZE)
-                            toggle = 0;
-
-                        rangetotag = instance_get_idist(toggle);
-                        b++;
-                    }
-#if (DISCOVERY == 1)
-                    sprintf((char *)&lcd_data[0], "T%d A%d: %3.2f m", taddr, toggle, instance_get_idist(toggle));
-#else
-                    sprintf((char *)&lcd_data[0], "T%d-A%d: %3.2f m  ", tagaddr, toggle, instance_get_idist(toggle));
-                    // sprintf((char *)&RxPower[0], "%3.1f dBm     ", inst->rxPower[toggle]);
-#endif
-                    LCD_DISPLAY(0, 48, lcd_data);
-                    // LCD_DISPLAY(52, 48, RxPower);
                     toggle++;
                     if (toggle >= MAX_ANCHOR_LIST_SIZE)
                         toggle = 0;
+
+                    rangetotag = instance_get_idist(toggle);
+                    b++;
                 }
-                printLCDTWRReports = portGetTickCnt();
-            }
+#if (DISCOVERY == 1)
+                sprintf((char *)&lcd_data[0], "T%d A%d: %3.2f m", taddr, toggle, instance_get_idist(toggle));
+#else
+                sprintf((char *)&lcd_data[0], "T%d-A%d: %3.2f m  ", tagaddr, toggle, instance_get_idist(toggle));
+                // sprintf((char *)&RxPower[0], "%3.1f dBm     ", inst->rxPower[toggle]);
 #endif
-        } */
-        // osDelay(1);
-    }
+                LCD_DISPLAY(0, 48, lcd_data);
+                // LCD_DISPLAY(52, 48, RxPower);
+                toggle++;
+                if (toggle >= MAX_ANCHOR_LIST_SIZE)
+                    toggle = 0;
+            }
+            printLCDTWRReports = portGetTickCnt();
+        }
+#endif
+    } */
+    // osDelay(1);
 }
 
 uint32 inittestapplication(void)

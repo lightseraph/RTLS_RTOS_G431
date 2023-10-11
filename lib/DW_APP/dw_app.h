@@ -6,7 +6,7 @@
 #include "instance.h"
 #include "kalman.h"
 
-void DW_Init_Task(void *argument);
-void DW_Main_Task(void *argument);
+void DW_Init_Task(void);
+void DW_Main_Task(void);
 
 #endif
