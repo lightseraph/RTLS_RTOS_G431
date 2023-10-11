@@ -370,7 +370,7 @@ void port_set_dw_ic_spi_fastrate(void)
  * @param      GPIO_Pin: Specifies the port pin connected to corresponding EXTI line.
  *             i.e. DW_RESET_Pin and DW_IRQn_Pin
  */
-void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin)
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
     switch (GPIO_Pin)
     {
@@ -421,7 +421,7 @@ __INLINE void process_deca_irq(void)
  * */
 __INLINE void port_DisableEXT_IRQ(void)
 {
-    NVIC_DisableIRQ(DECAIRQ_EXTI_IRQn);
+    HAL_NVIC_DisableIRQ(DECAIRQ_EXTI_IRQn);
 }
 
 /* @fn      port_EnableEXT_IRQ
@@ -430,7 +430,7 @@ __INLINE void port_DisableEXT_IRQ(void)
  * */
 __INLINE void port_EnableEXT_IRQ(void)
 {
-    NVIC_EnableIRQ(DECAIRQ_EXTI_IRQn);
+    HAL_NVIC_EnableIRQ(DECAIRQ_EXTI_IRQn);
 }
 
 /* @fn      port_GetEXT_IRQStatus
