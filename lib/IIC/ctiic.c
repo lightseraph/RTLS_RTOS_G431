@@ -17,11 +17,13 @@
 //  1,修改IIC_ReadByte函数,读数据更快.
 //  2,修改IIC_Wait_Ack函数,以支持MDK的-O2优化.
 //////////////////////////////////////////////////////////////////////////////////
+// G431 150MHz 优化的时序，i2c频率约540KHz
+// 20：760KHz, 30: 550KHz, 42: 400KHz
 
 // 控制I2C速度的延时
 void IIC_Delay(void)
 {
-	for (int i = 0; i < 35; i++) // 150M G431
+	for (int i = 0; i < 20; i++) // 150M G431
 		__NOP();
 }
 // 电容触摸芯片IIC接口初始化
@@ -39,7 +41,7 @@ void IIC_Start(void)
 	IIC_SDA(0); // START:when CLK is high,DATA change form high to low
 	IIC_Delay();
 	IIC_SCL(0); // 钳住I2C总线，准备发送或接收数据
-	IIC_Delay();
+				// IIC_Delay();
 }
 // 产生IIC停止信号
 void IIC_Stop(void)
@@ -70,7 +72,7 @@ u8 IIC_Wait_Ack(void)
 	{
 		ucErrTime++;
 
-		if (ucErrTime > 250)
+		if (ucErrTime > 12)
 		{
 			IIC_Stop();
 			rack = 1;

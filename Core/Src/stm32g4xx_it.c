@@ -71,8 +71,8 @@ extern TIM_HandleTypeDef htim7;
 /*           Cortex-M4 Processor Interruption and Exception Handlers          */
 /******************************************************************************/
 /**
-  * @brief This function handles Non maskable interrupt.
-  */
+ * @brief This function handles Non maskable interrupt.
+ */
 void NMI_Handler(void)
 {
   /* USER CODE BEGIN NonMaskableInt_IRQn 0 */
@@ -86,8 +86,8 @@ void NMI_Handler(void)
 }
 
 /**
-  * @brief This function handles Hard fault interrupt.
-  */
+ * @brief This function handles Hard fault interrupt.
+ */
 void HardFault_Handler(void)
 {
   /* USER CODE BEGIN HardFault_IRQn 0 */
@@ -101,8 +101,8 @@ void HardFault_Handler(void)
 }
 
 /**
-  * @brief This function handles Memory management fault.
-  */
+ * @brief This function handles Memory management fault.
+ */
 void MemManage_Handler(void)
 {
   /* USER CODE BEGIN MemoryManagement_IRQn 0 */
@@ -116,8 +116,8 @@ void MemManage_Handler(void)
 }
 
 /**
-  * @brief This function handles Prefetch fault, memory access fault.
-  */
+ * @brief This function handles Prefetch fault, memory access fault.
+ */
 void BusFault_Handler(void)
 {
   /* USER CODE BEGIN BusFault_IRQn 0 */
@@ -131,8 +131,8 @@ void BusFault_Handler(void)
 }
 
 /**
-  * @brief This function handles Undefined instruction or illegal state.
-  */
+ * @brief This function handles Undefined instruction or illegal state.
+ */
 void UsageFault_Handler(void)
 {
   /* USER CODE BEGIN UsageFault_IRQn 0 */
@@ -146,8 +146,8 @@ void UsageFault_Handler(void)
 }
 
 /**
-  * @brief This function handles Debug monitor.
-  */
+ * @brief This function handles Debug monitor.
+ */
 void DebugMon_Handler(void)
 {
   /* USER CODE BEGIN DebugMonitor_IRQn 0 */
@@ -166,8 +166,8 @@ void DebugMon_Handler(void)
 /******************************************************************************/
 
 /**
-  * @brief This function handles EXTI line4 interrupt.
-  */
+ * @brief This function handles EXTI line4 interrupt.
+ */
 void EXTI4_IRQHandler(void)
 {
   /* USER CODE BEGIN EXTI4_IRQn 0 */
@@ -180,8 +180,8 @@ void EXTI4_IRQHandler(void)
 }
 
 /**
-  * @brief This function handles DMA1 channel1 global interrupt.
-  */
+ * @brief This function handles DMA1 channel1 global interrupt.
+ */
 void DMA1_Channel1_IRQHandler(void)
 {
   /* USER CODE BEGIN DMA1_Channel1_IRQn 0 */
@@ -194,8 +194,8 @@ void DMA1_Channel1_IRQHandler(void)
 }
 
 /**
-  * @brief This function handles DMA1 channel2 global interrupt.
-  */
+ * @brief This function handles DMA1 channel2 global interrupt.
+ */
 void DMA1_Channel2_IRQHandler(void)
 {
   /* USER CODE BEGIN DMA1_Channel2_IRQn 0 */
@@ -208,8 +208,8 @@ void DMA1_Channel2_IRQHandler(void)
 }
 
 /**
-  * @brief This function handles EXTI line[9:5] interrupts.
-  */
+ * @brief This function handles EXTI line[9:5] interrupts.
+ */
 void EXTI9_5_IRQHandler(void)
 {
   /* USER CODE BEGIN EXTI9_5_IRQn 0 */
@@ -220,35 +220,35 @@ void EXTI9_5_IRQHandler(void)
   /* USER CODE BEGIN EXTI9_5_IRQn 1 */
   if ((GPIOB->IDR & KEY_Minus_PIN) == 0)
   {
-    key[1].flag.key_state = KEY_STATE_PRESS; // 按下
-    key[1].flag.check = 1;
-    key[1].time_continus = 0; // 按键持续时间置零，准备开始计时
-  }
-  else if ((GPIOB->IDR & KEY_Minus_PIN) != 0 && key[1].flag.key_state == KEY_STATE_PRESS)
-  {
-    key[1].flag.key_state = KEY_STATE_RELEASE; // 松开
-    key[1].flag.check = 1;
-    key[1].time_idle = 0; // 按键空闲时间置零，准备开始计时
-  }
-
-  if ((GPIOB->IDR & KEY_Plus_PIN) == 0)
-  {
     key[0].flag.key_state = KEY_STATE_PRESS; // 按下
     key[0].flag.check = 1;
     key[0].time_continus = 0; // 按键持续时间置零，准备开始计时
   }
-  else if ((GPIOB->IDR & KEY_Plus_PIN) != 0 && key[0].flag.key_state == KEY_STATE_PRESS)
+  else if ((GPIOB->IDR & KEY_Minus_PIN) != 0 && key[0].flag.key_state == KEY_STATE_PRESS)
   {
     key[0].flag.key_state = KEY_STATE_RELEASE; // 松开
     key[0].flag.check = 1;
     key[0].time_idle = 0; // 按键空闲时间置零，准备开始计时
   }
+
+  if ((GPIOB->IDR & KEY_Plus_PIN) == 0)
+  {
+    key[1].flag.key_state = KEY_STATE_PRESS; // 按下
+    key[1].flag.check = 1;
+    key[1].time_continus = 0; // 按键持续时间置零，准备开始计时
+  }
+  else if ((GPIOB->IDR & KEY_Plus_PIN) != 0 && key[1].flag.key_state == KEY_STATE_PRESS)
+  {
+    key[1].flag.key_state = KEY_STATE_RELEASE; // 松开
+    key[1].flag.check = 1;
+    key[1].time_idle = 0; // 按键空闲时间置零，准备开始计时
+  }
   /* USER CODE END EXTI9_5_IRQn 1 */
 }
 
 /**
-  * @brief This function handles USART2 global interrupt / USART2 wake-up interrupt through EXTI line 26.
-  */
+ * @brief This function handles USART2 global interrupt / USART2 wake-up interrupt through EXTI line 26.
+ */
 void USART2_IRQHandler(void)
 {
   /* USER CODE BEGIN USART2_IRQn 0 */
@@ -261,8 +261,8 @@ void USART2_IRQHandler(void)
 }
 
 /**
-  * @brief This function handles TIM6 global interrupt, DAC1 and DAC3 channel underrun error interrupts.
-  */
+ * @brief This function handles TIM6 global interrupt, DAC1 and DAC3 channel underrun error interrupts.
+ */
 void TIM6_DAC_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM6_DAC_IRQn 0 */
@@ -275,8 +275,8 @@ void TIM6_DAC_IRQHandler(void)
 }
 
 /**
-  * @brief This function handles TIM7 global interrupt.
-  */
+ * @brief This function handles TIM7 global interrupt.
+ */
 void TIM7_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM7_IRQn 0 */

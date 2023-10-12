@@ -53,6 +53,10 @@
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
+#if configGENERATE_RUN_TIME_STATS == 1
+extern uint32_t g_osRuntimeCounter;
+
+#endif
 extern uint8_t UART_RX_DATA[256];
 /* USER CODE END Variables */
 /* Definitions for defaultTask */
@@ -60,7 +64,7 @@ osThreadId_t defaultTaskHandle;
 const osThreadAttr_t defaultTask_attributes = {
     .name = "defaultTask",
     .priority = (osPriority_t)osPriorityNormal,
-    .stack_size = 100 * 4};
+    .stack_size = 80 * 4};
 /* Definitions for Flash_LED */
 osThreadId_t Flash_LEDHandle;
 const osThreadAttr_t Flash_LED_attributes = {
@@ -90,13 +94,13 @@ osThreadId_t Parse_RXHandle;
 const osThreadAttr_t Parse_RX_attributes = {
     .name = "Parse_RX",
     .priority = (osPriority_t)osPriorityNormal,
-    .stack_size = 230 * 4};
+    .stack_size = 150 * 4};
 /* Definitions for OLED_Display */
 osThreadId_t OLED_DisplayHandle;
 const osThreadAttr_t OLED_Display_attributes = {
     .name = "OLED_Display",
     .priority = (osPriority_t)osPriorityNormal,
-    .stack_size = 220 * 4};
+    .stack_size = 150 * 4};
 /* Definitions for DW_Init */
 osThreadId_t DW_InitHandle;
 const osThreadAttr_t DW_Init_attributes = {
@@ -108,13 +112,13 @@ osThreadId_t DW_MainHandle;
 const osThreadAttr_t DW_Main_attributes = {
     .name = "DW_Main",
     .priority = (osPriority_t)osPriorityBelowNormal,
-    .stack_size = 850 * 4};
+    .stack_size = 350 * 4};
 /* Definitions for SerialOut */
 osThreadId_t SerialOutHandle;
 const osThreadAttr_t SerialOut_attributes = {
     .name = "SerialOut",
     .priority = (osPriority_t)osPriorityLow7,
-    .stack_size = 150 * 4};
+    .stack_size = 120 * 4};
 /* Definitions for FLASH_LED_Q */
 osMessageQueueId_t FLASH_LED_QHandle;
 const osMessageQueueAttr_t FLASH_LED_Q_attributes = {
@@ -162,11 +166,12 @@ unsigned long getRunTimeCounterValue(void);
 /* Functions needed when configGENERATE_RUN_TIME_STATS is on */
 __weak void configureTimerForRunTimeStats(void)
 {
+  g_osRuntimeCounter = 0;
 }
 
 __weak unsigned long getRunTimeCounterValue(void)
 {
-  return 0;
+  return g_osRuntimeCounter;
 }
 /* USER CODE END 1 */
 
@@ -444,6 +449,7 @@ void OLED_Display_Task(void *argument)
       flashParam.interval = 30;
       xQueueSend(FLASH_LED_QHandle, (void *)&flashParam, pdMS_TO_TICKS(500));
       dead_time = 0;
+      LCD_DISPLAY_UWB();
     }
     EventBits_t event = xEventGroupWaitBits(KEY_EVENTHandle,
                                             EVENTBIT_KEY_PLUS_LONGPRESS | EVENTBIT_KEY_MINUS_LONGPRESS,

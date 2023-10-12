@@ -56,6 +56,9 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+#if configGENERATE_RUN_TIME_STATS == 1
+uint32_t g_osRuntimeCounter = 0;
+#endif
 extern uint8_t UART_RX_BUF[1];
 /* USER CODE END PV */
 
@@ -232,7 +235,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     HAL_IncTick();
   }
   /* USER CODE BEGIN Callback 1 */
-
+  if (htim->Instance == TIM6)
+    g_osRuntimeCounter++;
   /* USER CODE END Callback 1 */
 }
 

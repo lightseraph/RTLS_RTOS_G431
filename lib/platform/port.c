@@ -370,7 +370,7 @@ void port_set_dw_ic_spi_fastrate(void)
  * @param      GPIO_Pin: Specifies the port pin connected to corresponding EXTI line.
  *             i.e. DW_RESET_Pin and DW_IRQn_Pin
  */
-void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin)
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
     switch (GPIO_Pin)
     {

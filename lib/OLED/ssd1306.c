@@ -13,7 +13,34 @@
 /* SSD1306 data buffer */
 static uint8_t SSD1306_Buffer[SSD1306_WIDTH * SSD1306_HEIGHT / 8];
 char row1_str[19] = {0};
-
+const uint8_t SSD_INIT_PARAM[28] = {0xAE,
+									0x20,
+									0x10,
+									0xB0,
+									0xC8,
+									0x00,
+									0x10,
+									0x40,
+									0x81,
+									0x60, // 亮度
+									0xA1,
+									0xA6,
+									0xA8,
+									0x3F,
+									0xA4,
+									0xD3,
+									0x00,
+									0xD5,
+									0xF0,
+									0xD9,
+									0x22,
+									0xDA,
+									0x12,
+									0xDB,
+									0x20,
+									0x8D,
+									0x14,
+									0xAF};
 /* Private SSD1306 structure */
 typedef struct
 {
@@ -39,10 +66,10 @@ uint8_t SSD1306_Init(void)
 	} */
 
 	/* A little delay */
-	HAL_Delay(100);
+	HAL_Delay(50);
 
 	/* Init LCD */
-	SSD1306_WRITECOMMAND(0xAE); // display off
+	/* SSD1306_WRITECOMMAND(0xAE); // display off
 	SSD1306_WRITECOMMAND(0x20); // Set Memory Addressing Mode
 	SSD1306_WRITECOMMAND(0x10); // 00,Horizontal Addressing Mode;01,Vertical Addressing Mode;10,Page Addressing Mode (RESET);11,Invalid
 	SSD1306_WRITECOMMAND(0xB0); // Set Page Start Address for Page Addressing Mode,0-7
@@ -69,7 +96,15 @@ uint8_t SSD1306_Init(void)
 	SSD1306_WRITECOMMAND(0x20); // 0x20,0.77xVcc
 	SSD1306_WRITECOMMAND(0x8D); //--set DC-DC enable
 	SSD1306_WRITECOMMAND(0x14); //
-	SSD1306_WRITECOMMAND(0xAF); //--turn on SSD1306 panel
+	SSD1306_WRITECOMMAND(0xAF); //--turn on SSD1306 panel */
+	IIC_Start();
+	IIC_SendByte_ack(SSD1306_I2C_ADDR);
+	for (u8 i = 0; i < 28; i++)
+	{
+		IIC_SendByte_ack(0x80); // 写数据寄存器地址
+		IIC_SendByte_ack(SSD_INIT_PARAM[i]);
+	}
+	IIC_Stop();
 
 	/* Clear screen */
 	SSD1306_Fill(SSD1306_COLOR_BLACK);
