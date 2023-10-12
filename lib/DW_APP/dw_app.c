@@ -143,10 +143,11 @@ void DW_Init_Task(void *argument)
         port_EnableEXT_IRQ();
         osDelay(2000);
         LCD_DISPLAY(0, 32, "                  ");
-        vTaskDelete(NULL);
     }
     else
         LCD_DISPLAY(0, 32, "DW Config Fail!");
+
+    vTaskDelete(NULL);
 }
 
 void DW_Main_Task(void *argument)

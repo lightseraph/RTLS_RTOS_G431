@@ -438,7 +438,7 @@ void OLED_Display_Task(void *argument)
   LED_Param flashParam;
   for (uint8_t dead_time = 0;;)
   {
-    // 进入设置模式后，无操作大约3秒，自动退出并保存参数
+    // 进入设置模式后，无操作大约3秒，自动退出并保存参数，并重启模块
     if (dead_time > 15)
     {
       xEventGroupClearBits(KEY_EVENTHandle, EVENTBIT_KEY_MINUS_LONGPRESS | EVENTBIT_KEY_PLUS_LONGPRESS);
@@ -446,10 +446,15 @@ void OLED_Display_Task(void *argument)
       flashParam.led = LED_YELLOW;
       flashParam.cond = LIGHT_OFF;
       flashParam.count = 4;
-      flashParam.interval = 30;
+      flashParam.interval = 40;
       xQueueSend(FLASH_LED_QHandle, (void *)&flashParam, pdMS_TO_TICKS(500));
       dead_time = 0;
       LCD_DISPLAY_UWB();
+      vTaskDelete(DW_MainHandle);
+      osDelay(10);
+      DW_MainHandle = osThreadNew(DW_Main_Task, NULL, &DW_Main_attributes);
+      osDelay(50);
+      DW_InitHandle = osThreadNew(DW_Init_Task, NULL, &DW_Init_attributes);
     }
     EventBits_t event = xEventGroupWaitBits(KEY_EVENTHandle,
                                             EVENTBIT_KEY_PLUS_LONGPRESS | EVENTBIT_KEY_MINUS_LONGPRESS,
