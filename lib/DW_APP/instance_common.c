@@ -59,6 +59,7 @@ int instance_calculate_rangefromTOF(int idx, uint32_t tofx)
 	// convert device time units to seconds (as floating point)
 	tof = tofi * DWT_TIME_UNITS;
 	inst_idistraw[idx] = distance = tof * SPEED_OF_LIGHT;
+	// printf("dist: %f\r\n", distance);
 
 	// for the 6.81Mb data rate we assume gating gain of 6dB is used,
 	// thus a different range bias needs to be applied
@@ -80,13 +81,12 @@ int instance_calculate_rangefromTOF(int idx, uint32_t tofx)
 		distance_to_correct = distance;
 	}
 
-	distance = distance - dwt_getrangebias(inst->configData.chan, (float)distance_to_correct, inst->configData.prf);
+	// distance = distance - dwt_getrangebias(inst->configData.chan, (float)distance_to_correct, inst->configData.prf);
 
 	if ((distance < 0) || (distance > 20000.000)) // discard any results less than <0 cm or >20 km
 		return 0;
 
 	inst_idist[idx] = distance;
-
 	inst->longTermRangeCount++; // for computing a long term average
 
 	return 1;
@@ -843,6 +843,7 @@ int instance_calc_ranges(uint32_t *array, uint16_t size, int reportRange, uint8_
 	for (i = 0; i < size; i++)
 	{
 		uint32_t tofx = array[i];
+		// printf("tof: %ld\r\n", tofx);
 		if (tofx != INVALID_TOF) // if ToF == 0 - then no new range to report
 		{
 			distance = instance_calculate_rangefromTOF(i, tofx);

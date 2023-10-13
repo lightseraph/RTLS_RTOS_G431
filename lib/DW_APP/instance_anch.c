@@ -797,10 +797,11 @@ int anch_app_run(instance_data_t *inst)
 					inst->AppState = TA_RXE_WAIT;
 					break;
 				}
-
+				printf("tag_index: %d\r\n", inst->shortAdd_idx);
 				if (((validResp & (0x1 << (inst->shortAdd_idx))) != 0)) // 如标签收到了该基站的RESP消息，则计算TOF
 				{
 					tof = calc_tof(messageData, inst->txu.anchorRespTxTime, dw_event->timeStamp, inst->tagPollRxTime, inst->shortAdd_idx);
+					// printf("tof: %llu\r\n", tof);
 				}
 
 				// 计算测距数值

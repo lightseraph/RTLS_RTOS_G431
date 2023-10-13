@@ -152,11 +152,11 @@ void DW_Init_Task(void *argument)
 
 void DW_Main_Task(void *argument)
 {
-    /* int rx = 0;
+    int rx = 0;
     int toggle = 0;
 
     uint64_t printLCDTWRReports = 0;
-    uint64_t NanTWRReports = 0; */
+    uint64_t NanTWRReports = 0;
 
     ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
     for (;;)
@@ -191,7 +191,7 @@ void DW_Main_Task(void *argument)
             inst->monitor = 0;
         }
 
-        /* rx = instance_newrange();
+        rx = instance_newrange();
         if (rx != TOF_REPORT_NUL)
         {
             NanTWRReports = 0;
@@ -268,7 +268,7 @@ void DW_Main_Task(void *argument)
                 printLCDTWRReports = portGetTickCnt();
             }
 #endif
-        } */
+        }
         // osDelay(1);
     }
 }

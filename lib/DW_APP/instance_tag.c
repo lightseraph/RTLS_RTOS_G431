@@ -375,6 +375,7 @@ int tag_app_run(instance_data_t *inst)
 #if (DEEP_SLEEP == 1)
 				dwt_entersleep(); // 进入低功耗睡眠模式
 #endif
+
 				if (inst->rxResponseMask != 0) // 将上个测距周期的resp消息计算出TOF
 				{
 					// 标签将resp消息内的TOF(n-1)计算和输出
