@@ -573,7 +573,7 @@ int tag_app_run(instance_data_t *inst)
 					inst->tagSleepCorrection_ms = (int16_t)(((uint16_t)messageData[RES_TAG_SLP1] << 8) + messageData[RES_TAG_SLP0]);
 					// printf("sleep correction: %ld\r\n", inst->tagSleepCorrection_ms);
 					/* char buff[20];
-					sprintf(buff, "correction: %ld\r\n", inst->tagSleepCorrection_ms);
+					sprintf(buff, "correction: %ld  ", inst->tagSleepCorrection_ms);
 					LCD_DISPLAY(0, 32, buff); */
 					inst->tagSleepRnd_ms = 0;
 				}
@@ -586,12 +586,15 @@ int tag_app_run(instance_data_t *inst)
 				{
 					inst->AppState = TA_TXFINAL_WAIT_SEND; // 发送final消息
 				}
-
+				char buff[20];
+				sprintf(buff, "cNum, rNum: %d, %d", currentRangeNum, inst->rangeNum);
+				LCD_DISPLAY(0, 32, buff);
 				if (currentRangeNum == inst->rangeNum)
 				{
 					// 将基站发送的resp消息内的TOF(n-1)接收并保存
 					memcpy(&inst->tofArray[tof_idx], &(messageData[TOFR]), 4);
 					// 校验TOF正确并对应到相应基站编号
+
 					if (inst->tofArray[tof_idx] != INVALID_TOF)
 					{
 						inst->rxResponseMask |= (0x1 << tof_idx);
